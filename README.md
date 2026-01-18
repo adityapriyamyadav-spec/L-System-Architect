@@ -6,7 +6,7 @@ This tool renders **Lindenmayer Systems** (math-based fractals) on a custom **In
 
 **Zero external dependencies required.** (Runs on standard Python).
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=Run+App+To+Take+Screenshot)
+![Project Screenshot](screenshot.png)
 
 ##  Key Features
 
