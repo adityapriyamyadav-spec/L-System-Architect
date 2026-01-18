@@ -4,6 +4,14 @@ from turtle import RawTurtle, TurtleScreen
 import random
 import colorsys
 import math
+import os
+
+# Check if Pillow is installed for PNG support
+try:
+    from PIL import Image, ImageOps
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 
 # --- 1. CONFIGURATION ---
 
@@ -298,23 +306,38 @@ def choose_background():
         screen.bgcolor(color)
 
 def save_image():
+    # 1. Ask where to save
     filename = filedialog.asksaveasfilename(defaultextension=".png", 
-                                            filetypes=[("PNG Image", "*.png")])
+                                            filetypes=[("PNG Image", "*.png"), ("Vector EPS", "*.eps")])
     if not filename: return
-    eps_file = filename.replace(".png", ".eps")
-    canvas.postscript(file=eps_file, colormode='color')
-    if filename.endswith(".png") and HAS_PIL:
-        try:
-            from PIL import Image
-            img = Image.open(eps_file)
-            img.load(scale=4) 
-            img.save(filename, 'png')
-            messagebox.showinfo("Success", "Saved PNG!")
-        except Exception as e:
-            log_to_console(f"Err: {e}")
-    else:
-        messagebox.showinfo("Saved", f"Saved as {filename}")
 
+    # 2. Tkinter can ONLY save as EPS first (we use this as a temp file)
+    temp_eps = filename.replace(".png", ".eps")
+    canvas.postscript(file=temp_eps, colormode='color')
+
+    # 3. If filename is EPS, we are done
+    if filename.endswith(".eps"):
+        messagebox.showinfo("Saved", f"Saved Vector EPS: {filename}")
+        return
+
+    # 4. Try to convert EPS -> PNG
+    if HAS_PIL:
+        try:
+            with Image.open(temp_eps) as img:
+                # Ghostscript is sometimes needed by PIL to read EPS
+                img.load(scale=4) # 4x High Resolution scale
+                img.save(filename, 'png')
+            
+            # Cleanup: Delete the temp EPS file so user only sees PNG
+            if os.path.exists(temp_eps):
+                os.remove(temp_eps)
+                
+            messagebox.showinfo("Success", f"High-Res PNG Saved!\n{filename}")
+            
+        except Exception as e:
+            messagebox.showerror("Conversion Error", f"Saved as EPS instead.\n\nError: {e}\n(You might need to install Ghostscript for EPS support)")
+    else:
+        messagebox.showwarning("Pillow Missing", "Python 'Pillow' library not found.\nSaved as .eps (Vector) instead.\n\nRun: pip install Pillow")
 def show_about():
     messagebox.showinfo("About", "L-System Architect\n\nControls:\n• LEFT CLICK + DRAG: Pan Canvas\n• LEFT CLICK (QUICK): Set Red Dot\n• SPACE + DRAG: Alternate Pan\n• SCROLL: Zoom")
 
