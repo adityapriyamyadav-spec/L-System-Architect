@@ -20,7 +20,7 @@ This tool renders **Lindenmayer Systems** (math-based fractals) on a custom **In
 
 1.  **Clone the repo:**
     ```bash
-    git clone [https://github.com/yourusername/l-system-architect.git](https://github.com/yourusername/l-system-architect.git)
+    git clone [https://github.com/adityapriyamyadav-spec/l-system-architect.git](https://github.com/adityapriyamyadav-spec/l-system-architect.git)
     ```
 2.  **Enter the folder:**
     ```bash
